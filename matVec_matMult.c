@@ -92,9 +92,9 @@ float* matMult(float* matrix0,float* matrix1,int l0, int c0,int l1,int c1){
 
 int main() {
     //srand(time(NULL));
-    int m = 1000;
-    int n = 1000;
-    int p = 1000;
+    int m = 100;
+    int n = 100;
+    int p = 100;
 
     float* matrix = fillRandMatrix(m,n);
     float* matrix1 = fillRandMatrix(n,p);
