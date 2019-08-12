@@ -5,7 +5,8 @@
 
 //Aloca vetor float com tamanho size
 float* aloc(int size){
-    float* vector = (float*) malloc(size* sizeof(float));
+    float* vector = (float*) calloc(size,sizeof(float));
+    
     return vector;
 }
 
@@ -22,11 +23,10 @@ void printMi(int* vetor,int n,int esp){
 
 //Printa matriz de float
 void printMf(float* vetor,int n,int esp){
-    //Vetor, tamanho dele, numero de elementos numa linha
+    //Vetor, num de elementos, numero de elementos numa linha(num de colunas)
     for(int i = 1; i <= n; i++){
         printf("%.3f ",vetor[i-1]);
-        if(i%esp == 0)
-            printf("\n");
+        if(i%esp == 0) printf("\n");
     }
     printf("\n");
 }
@@ -37,10 +37,7 @@ float* fillRandMatrix(int m,int n){
     int size = m*n;
     float *matrix = aloc(size);
     
-    if (matrix == NULL){
-        printf("Deu ruim :( \n");
-        exit(0);
-    }
+    if (matrix == NULL){ printf("Deu ruim :( \n"); exit(0); }
 
     for(int i = 0; i <= size; i++)
         matrix[i] = rand() % 10;
@@ -48,10 +45,25 @@ float* fillRandMatrix(int m,int n){
     return matrix;
 } 
 
-//retorna matriz[i][j]
+//printa matriz[i][j]
 void acesso(float* matrix,int i,int j,int n){
     //n = número de colunas da matriz
     printf("%d,%d = %f \n",i,j,matrix[i*n + j]);
+
+}
+
+//Soma duas matrizes
+float* matSum(float* matrix0,float* matrix1,int l0, int c0,  int l1, int c1){
+    if ((l0 != l1) || (c0!=c1)){ printf("Matrizes de tamanhos diferentes"); exit(0); }
+
+    int size = l0 * c0;
+    float* b = aloc(size);
+   
+    
+    for (int i = 0; i < size; i++)
+        b[i] = matrix0[i] + matrix1[i];
+    
+    return b;
 
 }
 
@@ -59,12 +71,9 @@ void acesso(float* matrix,int i,int j,int n){
 //Multiplicacao matriz com vetor por comb.linear
 float* matVec(float* matrix,float* vetor,int m,int n,int p){
     //matriz,vetor,linhas da matriz,colunas da matriz,linhas do vetor
-    if (n != p){
-        printf("Colunas da matriz != Linhas do vetor");
-        exit(0);
-    }
+    if (n != p){ printf("Colunas da matriz != Linhas do vetor"); exit(0); }
 
-    float* b = (float*) malloc(m*p*sizeof(float));
+    float* b = aloc(m*p);
     for(int i = 0; i < m; i++)
         for(int j = 0; j < n; j++)
             b[i] = b[i] + matrix[i*n +j] * vetor[j];
@@ -72,14 +81,12 @@ float* matVec(float* matrix,float* vetor,int m,int n,int p){
     return b;
 }
 
+//Multiplicação de matrizes
 float* matMult(float* matrix0,float* matrix1,int l0, int c0,int l1,int c1){
     //Linha e coluna da matriz 0 e da matriz1 
-    if (c0 != l1){
-        printf("Colunas da matriz0 != Linhas da matriz1");
-        exit(0);
-    }
+    if (c0 != l1){ printf("Colunas da matriz0 != Linhas da matriz1"); exit(0); }
 
-    float* b = (float*) malloc(l0*c1*sizeof(float));
+    float* b = aloc(l0*c1);
 
     for(int i = 0; i < l0; i++)
         for(int j = 0; j < c1; j++)
@@ -89,6 +96,28 @@ float* matMult(float* matrix0,float* matrix1,int l0, int c0,int l1,int c1){
     return b;
 }
 
+//Multiplicação de matrizes quadradas por bloco
+float* matMultBlock(float* matrix0,float* matrix1,int l0, int c0,int l1,int c1){
+    //Linha e coluna da matriz 0 e da matriz1 
+    if ((l0 != c0) || (l1!=c1)) { printf("Matrizes nao-quadradas"); exit (0); }
+
+    
+    int n = l0;
+    //tam dos blocos
+    int s = 20;
+    //int s = 1, 2, 4, 5, 10, 20, 25, 50, 100;
+    //num de blocos
+    int r = n/s;
+    int k[r];
+    float** b =  (float**) calloc(r,sizeof(float));
+
+    for (int i = 0; i < l0; i+=s)
+        k[i] = i;
+
+    return b;
+}
+
+
 
 int main() {
     //srand(time(NULL));
@@ -97,19 +126,24 @@ int main() {
     int p = 100;
 
     float* matrix = fillRandMatrix(m,n);
-    float* matrix1 = fillRandMatrix(n,p);
+    //float* matrix1 = fillRandMatrix(n,p);
+    float* matrix1 = fillRandMatrix(m,n);
     //float* vector = fillRandMatrix(n,1);
 
-    //printMf(matrix,m*n,n);
-    //printMf(matrix1,p*n,p);
-    //printMf(vector,n,1);
+   // printMf(matrix,m*n,n);
+   // printMf(matrix1,p*n,p);
+   // printMf(vector,n,1);
+    
     clock_t t = clock();  
     //float* b = matVec(matrix,vector,m,n,n); 
-    float* b = matMult(matrix,matrix1,m,n,n,p);
+    //float* b = matMult(matrix,matrix1,m,n,n,p);
+    //float* b = matSum(matrix,matrix1,m,n,m,n);
+    float* b = matMultBlock(matrix,matrix1,m,n,m,n);
     t = clock() - t; 
     double time_taken = ((double)t)/CLOCKS_PER_SEC;
     printf("%f segundos \n \n",time_taken);
-    //printMf(b,m*p,p);
+    
+    //printMf(b,m*n,n);
 
     free(matrix);
     free(matrix1);
