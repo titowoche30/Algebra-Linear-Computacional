@@ -114,7 +114,6 @@ int main() {
     srand(time(NULL));
     int samples = 5;
     int dim = 2000;
-    printf("AAAAAAAAAAA\n"); 
     double* matrix = fillRandMatrix(dim,dim);
     double* matrix1 = fillRandMatrix(dim,dim);
     double* b = aloc(dim*dim);
